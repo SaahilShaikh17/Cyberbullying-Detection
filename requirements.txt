@@ -2,6 +2,7 @@ streamlit
 pandas
 numpy
 matplotlib
-re
 nltk
-joblib
+wordnet
+stopwords
+# Add any other required packages
