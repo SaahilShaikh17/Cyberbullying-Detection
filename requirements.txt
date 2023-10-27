@@ -6,6 +6,6 @@ nltk
 wordnet
 stopwords
 scikit-learn==1.2.2
-joblib==0.14.0
+joblib==1.1.1
 
 # Add any other required packages
