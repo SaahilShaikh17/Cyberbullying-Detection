@@ -8,6 +8,10 @@ from nltk.tokenize import word_tokenize
 import streamlit as st
 import joblib
 
+# Download nltk data (add this to your code)
+nltk.download('punkt')
+nltk.download('stopwords')
+
 lemma = WordNetLemmatizer()
 
 model = joblib.load('Logisticregression.pkl')
@@ -20,27 +24,27 @@ vectorizer = joblib.load('vectorizer.pkl')
 # Define the preprocessing function
 def DataPrep(text):
     # Apply regular expression substitutions to each element in the Series
-    text = text.apply(lambda x: re.sub('<.*?>', '', x))
-    text = text.apply(lambda x: re.sub(r'http\S+', '', x))
-    text = text.apply(lambda x: re.sub(r'@\S+', '', x))
-    text = text.apply(lambda x: re.sub(r'#\S+', '', x))
-    text = text.apply(lambda x: re.sub(r'\d+', '', x))
-    text = text.apply(lambda x: re.sub(r'[^\w\s]', '', x))
+    text = re.sub('<.*?>', '', text)
+    text = re.sub(r'http\S+', '', text)
+    text = re.sub(r'@\S+', '', text)
+    text = re.sub(r'#\S+', '', text)
+    text = re.sub(r'\d+', '', text)
+    text = re.sub(r'[^\w\s]', '', text)
 
-    tokens = text.apply(nltk.word_tokenize)
+    tokens = nltk.word_tokenize(text)
 
     # Remove punctuation
     punc = list(punctuation)
-    words = tokens.apply(lambda x: [w for w in x if w not in punc])
+    words = [w for w in tokens if w not in punc]
 
     # Remove stop words
     stop_words = set(stopwords.words('english'))
-    words = words.apply(lambda x: [w.lower() for w in x if not w.lower() in stop_words])
+    words = [w.lower() for w in words if not w.lower() in stop_words]
 
     # Lemmatization
-    words = words.apply(lambda x: [lemma.lemmatize(w) for w in x])
+    words = [lemma.lemmatize(w) for w in words]
 
-    text = words.apply(lambda x: ' '.join(x))
+    text = ' '.join(words)
 
     return text
 
@@ -52,14 +56,11 @@ def main():
     if not input_tweet:
         st.warning('Please enter some input data.')
     else:
-        test_pred = pd.Series([input_tweet])
-        test_pred = test_pred.apply(lambda x: ' '.join([word for word in x.split() if word not in set(stopwords.words('english'))]))
-        test_pred = test_pred.str.replace('\W', ' ', regex=True)
-        test_pred = test_pred.str.lower()
-        test_pred = DataPrep(test_pred)
+        # Preprocess the input data
+        input_tweet = DataPrep(input_tweet)
 
         # Transform the input tweet using the vectorizer
-        test_data_transformed = vectorizer.transform(test_pred)
+        test_data_transformed = vectorizer.transform([input_tweet])
 
         # Create a dictionary to store the class labels and probabilities
         class_labels = {
@@ -68,7 +69,6 @@ def main():
             2: "Gender",
             3: "Religion",
             4: "Not_Cyberbullying",
-            
         }
 
         # Make predictions using all three models
