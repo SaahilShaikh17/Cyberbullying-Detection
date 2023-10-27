@@ -5,4 +5,5 @@ matplotlib
 nltk
 wordnet
 stopwords
+scikit-learn
 # Add any other required packages
