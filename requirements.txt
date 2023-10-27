@@ -7,5 +7,6 @@ wordnet
 stopwords
 scikit-learn==1.2.2
 joblib==1.1.1
+pip==23.3.1
 
 # Add any other required packages
